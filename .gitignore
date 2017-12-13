@@ -1,0 +1,8 @@
+
+*.obj
+
+dungeon/Debug/
+
+dungeon/Release/
+
+dungeon/x64/Debug/
