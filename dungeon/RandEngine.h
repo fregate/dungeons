@@ -6,19 +6,20 @@
 
 struct RandomEngineF
 {
+	uint32_t seed;
 	std::uniform_real_distribution<double> dist;
 	std::default_random_engine re;
 	RandomEngineF(uint32_t numSeed = 0)
 	{
-		if (numSeed == 0)
-			re.seed(static_cast<unsigned int>(std::chrono::system_clock::now().time_since_epoch().count()));
-		else
-			re.seed(numSeed);
+		init(numSeed);
 	}
 
-	double operator () ()
-	{
-		return get();
+	void init(uint32_t numSeed) {
+		if (numSeed == 0) {
+			numSeed = static_cast<unsigned int>(std::chrono::system_clock::now().time_since_epoch().count());
+		}
+		seed = numSeed;
+		re.seed(seed);
 	}
 
 	double get()
@@ -29,7 +30,7 @@ struct RandomEngineF
 	template<class T>
 	T range(const T& bnd1, const T& bnd2)
 	{
-		return static_cast<T>(bnd1 + (bnd2 - bnd1) * get());
+		return static_cast<T>(bnd1 + std::floor((bnd2 - bnd1) * get()));
 	}
 
 	// 	template<class T>
@@ -44,9 +45,3 @@ struct RandomEngineF
 		return range(0, v) == T(0);
 	}
 };
-
-template<>
-bool RandomEngineF::range<bool>(const bool&, const bool&)
-{
-	return static_cast<int>(get() + .5) == 1;
-}
